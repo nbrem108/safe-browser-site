@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tiny Internet — a smaller internet for young children</title>
-<meta name="description" content="A browser for children five to ten that opens only the websites you approve. Windows and macOS. No account, no tracking, and nothing about your child sent to an AI service.">
+<meta name="description" content="A browser for children two to ten that opens only the websites you approve. Windows and macOS. No account, no tracking, and nothing about your child sent to an AI service.">
 <meta property="og:title" content="Tiny Internet — a smaller internet">
 <meta property="og:description" content="Your child gets a screen with the websites you picked, and nothing else.">
 <meta property="og:type" content="website">
@@ -13,6 +13,7 @@
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/assets/og-icon.png">
 <meta name="theme-color" content="#0284c7">
+<meta name="color-scheme" content="light">
 <style>*{box-sizing:border-box}html,body{margin:0}</style>
 </head>
 <body>
@@ -40,23 +41,6 @@
     --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --ink: #e2e8f0; --ink-soft: #cbd5e1; --muted: #94a3b8;
-      --rule: #1e293b; --page: #0b1220; --card: #131c2b;
-      --sky-wash: #0c2a3f; --blocked-wash: #3b1220;
-    }
-  }
-  :root[data-theme="dark"] {
-    --ink: #e2e8f0; --ink-soft: #cbd5e1; --muted: #94a3b8;
-    --rule: #1e293b; --page: #0b1220; --card: #131c2b;
-    --sky-wash: #0c2a3f; --blocked-wash: #3b1220;
-  }
-  :root[data-theme="light"] {
-    --ink: #1e293b; --ink-soft: #475569; --muted: #64748b;
-    --rule: #e2e8f0; --page: #f8fafc; --card: #ffffff;
-    --sky-wash: #e0f2fe; --blocked-wash: #ffe4e6;
-  }
 
   * { box-sizing: border-box; }
 
@@ -89,6 +73,15 @@
     color: var(--sky); background: var(--sky-wash);
     padding: 0.45rem 0.7rem; border-radius: 999px;
   }
+
+  .brand { text-decoration: none; color: inherit; }
+  .brand img { display: block; }
+
+  /* The mark is the product's whole idea in one shape, so give it room rather
+     than treating it as a bullet point. Drops out below the fold on phones
+     where vertical space is the scarce thing. */
+  .hero-mark { display: block; margin: 0 0 0.4rem; }
+  @media (max-width: 40rem) { .hero-mark { width: 76px; height: 76px; } }
 
   /* ---------- buttons ---------- */
   .btns { display: flex; flex-wrap: wrap; gap: 0.8rem; }
@@ -195,16 +188,18 @@
 
 <div class="wrap">
   <header class="mast">
-    <div class="brand">
-      <img src="/assets/favicon.svg" width="28" height="28" alt="" aria-hidden="true">
+    <a class="brand" href="/">
+      <img src="/assets/icon-mark.svg" width="34" height="34" alt="" aria-hidden="true">
       Tiny Internet
-    </div>
+    </a>
     <div class="badge-os">Windows &amp; macOS · Beta</div>
   </header>
 
   <section class="hero">
     <div class="stack">
-      <p class="eyebrow">Made for ages 5 to 10</p>
+      <img class="hero-mark" src="/assets/icon-mark.svg" width="104" height="104"
+           alt="The Tiny Internet icon: a small house and tree inside a warm circle.">
+      <p class="eyebrow">Made for ages 2 to 10</p>
       <h1>A smaller internet.</h1>
       <p class="lede">
         Your child gets a screen with the websites you picked, and nothing else.
@@ -239,7 +234,7 @@
           <div class="app"><span class="emo">⭐</span><span class="nm">Starfall</span><span class="cat">Learn</span></div>
           <div class="app"><span class="emo">🔤</span><span class="nm">ABCya</span><span class="cat">Games</span></div>
           <div class="app"><span class="emo">🧠</span><span class="nm">Funbrain</span><span class="cat">Games</span></div>
-          <div class="app"><span class="emo">📖</span><span class="nm">Wonderopolis</span><span class="cat">Learn</span></div>
+          <div class="app"><span class="emo">🔬</span><span class="nm">Exploratorium</span><span class="cat">Create</span></div>
         </div>
       </div>
     </div>
