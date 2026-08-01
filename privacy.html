@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy and data handling — Safe Browser</title>
+<meta name="description" content="Exactly what Safe Browser sends, where it goes, and what is stored. Written from the source code, not from a template.">
+<meta name="robots" content="index,follow">
+<style>*{box-sizing:border-box}html,body{margin:0}</style>
+</head>
+<body>
+<style>
+  :root {
+    --sky: #0284c7;
+    --sky-deep: #0369a1;
+    --sky-wash: #e0f2fe;
+    --amber: #fffbeb;
+    --amber-line: #fde9bd;
+    --ink: #1e293b;
+    --ink-soft: #475569;
+    --muted: #64748b;
+    --rule: #e2e8f0;
+    --page: #f8fafc;
+    --card: #ffffff;
+    --safe: #34d399;
+    --safe-ink: #065f46;
+    --blocked: #e11d48;
+    --blocked-wash: #ffe4e6;
+    --round: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", "Varela Round", "Trebuchet MS", system-ui, sans-serif;
+    --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #e2e8f0; --ink-soft: #cbd5e1; --muted: #94a3b8;
+      --rule: #1e293b; --page: #0b1220; --card: #131c2b;
+      --sky-wash: #0c2a3f; --blocked-wash: #3b1220; --amber: #1a1710; --amber-line: #3d3320;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #e2e8f0; --ink-soft: #cbd5e1; --muted: #94a3b8;
+    --rule: #1e293b; --page: #0b1220; --card: #131c2b;
+    --sky-wash: #0c2a3f; --blocked-wash: #3b1220;
+  }
+  :root[data-theme="light"] {
+    --ink: #1e293b; --ink-soft: #475569; --muted: #64748b;
+    --rule: #e2e8f0; --page: #f8fafc; --card: #ffffff;
+    --sky-wash: #e0f2fe; --blocked-wash: #ffe4e6;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font-family: var(--sans); font-size: 17px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 0 1.4rem; }
+
+  header.top {
+    background: var(--sky); color: #fff; padding: 0.7rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  header.top .wrap { display: flex; align-items: center; gap: 0.7rem; }
+  header.top a { color: #fff; text-decoration: none; font-weight: 600; font-family: var(--round); }
+  header.top .badge {
+    background: var(--safe); color: var(--safe-ink);
+    border-radius: 999px; padding: 0.1rem 0.6rem;
+    font-size: 0.8rem; font-weight: 700;
+  }
+
+  h1 {
+    font-family: var(--round); font-size: clamp(1.9rem, 5vw, 2.6rem);
+    line-height: 1.15; margin: 2.4rem 0 0.6rem;
+  }
+  h2 {
+    font-family: var(--round); font-size: 1.35rem;
+    margin: 2.4rem 0 0.6rem; padding-top: 1.6rem;
+    border-top: 1px solid var(--rule);
+  }
+  h3 { font-family: var(--round); font-size: 1.05rem; margin: 1.6rem 0 0.4rem; }
+  p { color: var(--ink-soft); margin: 0.7rem 0; }
+  .lede { font-size: 1.1rem; color: var(--ink-soft); }
+  .fine { font-size: 0.9rem; color: var(--muted); }
+  strong { color: var(--ink); }
+  a { color: var(--sky-deep); }
+
+  .note {
+    background: var(--amber); border: 1px solid var(--amber-line);
+    border-radius: 0.8rem; padding: 1rem 1.1rem; margin: 1.4rem 0;
+  }
+  .note p:first-child { margin-top: 0; }
+  .note p:last-child { margin-bottom: 0; }
+
+  .flag {
+    background: var(--blocked-wash); border: 1px solid var(--blocked);
+    border-radius: 0.8rem; padding: 1rem 1.1rem; margin: 1.4rem 0;
+  }
+  .flag p:first-child { margin-top: 0; }
+  .flag p:last-child { margin-bottom: 0; }
+
+  .tablewrap { overflow-x: auto; margin: 1.2rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.93rem; min-width: 34rem; }
+  th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-family: var(--round); color: var(--ink); font-size: 0.88rem; }
+  td { color: var(--ink-soft); }
+
+  ul { color: var(--ink-soft); padding-left: 1.2rem; }
+  li { margin: 0.35rem 0; }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.88em; background: var(--sky-wash); color: var(--ink);
+    padding: 0.1rem 0.35rem; border-radius: 0.3rem;
+  }
+
+  footer.foot {
+    margin-top: 3.5rem; padding: 2rem 0 3rem;
+    border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.92rem;
+  }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a href="/">← Safe Browser</a>
+    <span class="badge">🛡 Safe</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+<h1>What Safe Browser sends, and where</h1>
+<p class="lede">
+  This page was written by reading the app's own source code and listing every
+  outbound network call it can make. It is not a template. If something below
+  turns out to be wrong, that is a bug and we want to hear about it.
+</p>
+
+<div class="flag">
+  <p><strong>Draft — not yet reviewed by a lawyer.</strong> This is an accurate
+     engineering description of what the software does. It is <em>not</em> yet a
+     legal privacy policy, and it has not been reviewed against COPPA (US),
+     UK GDPR, or the EU GDPR provisions covering children. If you are reading
+     this as a prospective beta family: that review is happening before the app
+     is offered to anyone outside a small group who know us personally.</p>
+</div>
+
+<h2>The short version</h2>
+<p>
+  With the settings the app ships with, <strong>nothing about your child leaves
+  your computer.</strong> No account, no sign-up, no email address, no analytics,
+  no crash reporting, no advertising identifiers. We do not have a server that
+  stores anything about your child, because we do not collect anything to store.
+</p>
+<p>
+  Three things do go out over the network, and none of them is about your child
+  specifically. They are listed in full below.
+</p>
+
+<h2>Everything that leaves the machine</h2>
+<p>
+  This is the complete list for the app's default settings. Each row says what
+  triggers it and exactly what is in it.
+</p>
+
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr><th>What</th><th>When</th><th>What is actually sent</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Ad and tracker filter lists</strong></td>
+      <td>Every time the app starts</td>
+      <td>A request to a public file host for the filter rules used to strip ads
+          out of pages. Your computer's IP address and browser identification
+          are visible to that host, as they are for any web request. Nothing
+          about your child, and nothing about which sites they visit, is included.</td>
+    </tr>
+    <tr>
+      <td><strong>Update check</strong></td>
+      <td>Every time the app starts, Windows only</td>
+      <td>A request to our own server asking "is there a newer version?". It
+          contains your IP address and the version you are running. It does not
+          contain an account, a device identifier, or anything about your child.
+          On macOS this does not happen at all.</td>
+    </tr>
+    <tr>
+      <td><strong>The websites your child opens</strong></td>
+      <td>When they use the browser</td>
+      <td>Exactly what any browser sends: the request goes to the site itself.
+          PBS Kids can see that someone visited PBS Kids. That traffic goes to
+          those sites, not to us — we never see which sites are opened.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <p><strong>What is deliberately not on that list.</strong> No analytics or
+     telemetry of any kind. No crash reporting. No remote configuration. No
+     account system or email capture. No advertising or attribution SDKs. The
+     app has never had any of these, and the absence is checked rather than
+     assumed.</p>
+</div>
+
+<h2>The AI features, and why they are off</h2>
+<p>
+  The app can use an AI service to help judge whether a page is suitable. In the
+  version you download, <strong>that is switched off</strong>, and a parent has to
+  turn it on deliberately. While it is off, no page content and no web address is
+  ever sent anywhere.
+</p>
+<p>
+  If a parent turns it on, page addresses and some page text are sent to an AI
+  provider (Anthropic or OpenAI) to be assessed. We think most families should
+  leave it off, and we would rather say that plainly than bury it.
+</p>
+<p>
+  The children's learning panel used to send the address of every page to an AI
+  service as your child browsed. <strong>That was removed.</strong> It now works
+  entirely from content built into the app, and makes no network request at all.
+</p>
+
+<h2>What is stored on your computer</h2>
+<p>Everything the app records stays on the machine it runs on. Nothing is uploaded.</p>
+<ul>
+  <li><strong>The parent password</strong> — stored encrypted using the operating system's own key store, never in plain text.</li>
+  <li><strong>Your approved-sites list and settings</strong> — a file in the app's own folder.</li>
+  <li><strong>An activity log</strong> — which sites were opened and when, so a parent can review it. This is <em>not</em> encrypted yet, which we consider a defect rather than a design choice, and it is on the list to fix.</li>
+  <li><strong>A random installation number</strong> — used only to limit abuse of the AI service if you switch it on. It is not linked to you, and it is not sent unless the AI features are enabled.</li>
+</ul>
+<p>
+  To delete all of it, uninstall the app and delete its folder. There is
+  currently no in-app "delete everything" button — also on the list, and also
+  not something we will pretend already exists.
+</p>
+
+<div class="note">
+  <p><strong>On Windows, the encryption depends on user accounts.</strong> The
+     parent password is protected using Windows' built-in encryption, which is
+     tied to the Windows user account. If your child uses the <em>same</em>
+     Windows account as you, or has administrator access, that protection does
+     not hold. Give your child their own standard (non-administrator) Windows
+     account.</p>
+</div>
+
+<h2>Honest limits</h2>
+<p>
+  We would rather you find these here than discover them later.
+</p>
+<ul>
+  <li><strong>This list was built by reading the code, not by watching the app run.</strong>
+      We have not yet put a finished build behind a network monitor for a full
+      session to confirm nothing else appears. That test is planned, and until
+      it happens this page describes what the source says, which is not quite
+      the same as what the machine does.</li>
+  <li><strong>Chromium does things we do not control.</strong> The app is built on
+      the same engine as Chrome. That engine makes its own low-level network
+      calls — certificate checks, DNS lookups — that we neither trigger nor can
+      fully enumerate.</li>
+  <li><strong>Safe Browser is an app, not a system-wide control.</strong> A child
+      who opens a different browser is outside it entirely. Use it alongside the
+      parental controls built into Windows and macOS, not instead of them.</li>
+  <li><strong>The current builds are not code-signed.</strong> Your operating
+      system will warn you the first time. That is expected during the beta and
+      explained on the download page.</li>
+</ul>
+
+<h2>Children's privacy</h2>
+<p>
+  This app is designed for children roughly five to ten years old. That places
+  it squarely inside the rules that exist specifically to protect children's
+  data — COPPA in the United States, and the children's provisions of UK and EU
+  data protection law.
+</p>
+<p>
+  Our position is that the safest way to comply with all of them is to
+  <strong>not collect anything in the first place</strong>, which is what the
+  default configuration does. We are not relying on that being enough: the
+  formal review against those rules is happening before the app is offered
+  beyond people we know personally.
+</p>
+
+<h2>Questions, or something wrong here</h2>
+<p>
+  If any statement on this page does not match what the app does, we want to
+  know — that is a bug in the software or a bug in this page, and both matter.
+  Security issues have their own reporting route in the project's
+  <code>SECURITY.md</code>.
+</p>
+
+<p class="fine">
+  This page describes the app as of the current beta release. When the app's
+  behaviour changes, this page changes in the same release — it is written from
+  the source, so it is not allowed to drift.
+</p>
+
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p class="fine">Safe Browser · Built for young children and the people looking after them.
+       <a href="/">Back to the main page</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
