@@ -1,8 +1,8 @@
 {
-  "name": "safe-browser-site",
+  "name": "tiny-internet-site",
   "version": "0.1.0",
   "private": true,
-  "description": "Landing page and download/update endpoints for Safe Browser.",
+  "description": "Landing page and download/update endpoints for Tiny Internet.",
   "devDependencies": {
     "@vercel/node": "^3.2.0",
     "typescript": "^5.4.0"

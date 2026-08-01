@@ -1,6 +1,6 @@
-# safe-browser-site
+# tiny-internet-site
 
-Landing page and distribution endpoints for Safe Browser. The app itself lives
+Landing page and distribution endpoints for Tiny Internet. The app itself lives
 in a separate, private repo.
 
 ## Endpoints
@@ -8,7 +8,7 @@ in a separate, private repo.
 | Path | Purpose |
 |---|---|
 | `/` | Landing page |
-| `/download/windows` | 302 to the current `Safe-Browser-Setup-*.exe` |
+| `/download/windows` | 302 to the current `Tiny-Internet-Setup-*.exe` |
 | `/download/mac` | 302 to the current arm64 `.dmg` |
 | `/download/mac?arch=intel` | 302 to the current x64 `.dmg` |
 | `/updates/latest.yml` | electron-updater feed |
@@ -33,7 +33,7 @@ publishes the draft that the app repo's release workflow creates.
 One environment variable:
 
 ```
-GH_TOKEN    fine-grained PAT, read-only Contents on nbrem108/safe-browser
+GH_TOKEN    fine-grained PAT, read-only Contents on nbrem108/tiny-internet
 ```
 
 Optional: `GH_OWNER`, `GH_REPO` to point elsewhere.

@@ -40,7 +40,7 @@ export async function latestRelease(): Promise<Release> {
     headers: {
       Authorization: `Bearer ${token()}`,
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'safe-browser-site',
+      'User-Agent': 'tiny-internet-site',
     },
   });
 
@@ -53,7 +53,7 @@ export async function latestRelease(): Promise<Release> {
       headers: {
         Authorization: `Bearer ${token()}`,
         Accept: 'application/vnd.github+json',
-        'User-Agent': 'safe-browser-site',
+        'User-Agent': 'tiny-internet-site',
       },
     });
     if (probe.ok) {
@@ -81,7 +81,7 @@ export async function assetUrl(assetId: number): Promise<string> {
       headers: {
         Authorization: `Bearer ${token()}`,
         Accept: 'application/octet-stream',
-        'User-Agent': 'safe-browser-site',
+        'User-Agent': 'tiny-internet-site',
       },
     }
   );

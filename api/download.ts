@@ -1,7 +1,7 @@
 // /download/windows  and  /download/mac
 //
 // Permanent URLs that survive every version bump. The installer filename
-// carries the version (Safe-Browser-Setup-1.0.1.exe), so linking a page
+// carries the version (Tiny-Internet-Setup-1.0.1.exe), so linking a page
 // straight at an asset breaks on the next release — which is exactly what the
 // old landing page would have done.
 //
@@ -12,11 +12,19 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { latestRelease, assetUrl, NoPublishedRelease } from './_github';
 
 // Matched against asset names in order; first hit wins.
+//
+// The product name prefix is deliberately loose. Renaming Safe Browser to Tiny
+// Internet changed every artifact filename, and a released build cannot be
+// renamed after the fact — so a strict prefix would have 502'd every download
+// the moment the site deployed, until a new release happened to be cut. Match
+// on the shape of the artifact instead of on branding, which is the part that
+// is actually stable.
+const NAME = '[A-Za-z-]+';
 const PATTERNS: Record<string, RegExp> = {
-  windows: /^Safe-Browser-Setup-.*\.exe$/,
-  'windows-portable': /^Safe-Browser-.*-win\.zip$/,
-  mac: /^Safe-Browser-.*-arm64\.dmg$/,
-  'mac-intel': /^Safe-Browser-(?!.*arm64).*\.dmg$/,
+  windows: new RegExp(`^${NAME}-Setup-.*\\.exe$`),
+  'windows-portable': new RegExp(`^${NAME}-.*-win\\.zip$`),
+  mac: new RegExp(`^${NAME}-.*-arm64\\.dmg$`),
+  'mac-intel': new RegExp(`^${NAME}-(?!.*arm64).*\\.dmg$`),
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
