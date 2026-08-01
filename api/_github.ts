@@ -33,6 +33,8 @@ function token(): string {
  * a DRAFT, so nothing is downloadable until a human publishes it. That human
  * step is the release gate, and this endpoint must not route around it.
  */
+export class NoPublishedRelease extends Error {}
+
 export async function latestRelease(): Promise<Release> {
   const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/releases/latest`, {
     headers: {
@@ -41,6 +43,25 @@ export async function latestRelease(): Promise<Release> {
       'User-Agent': 'safe-browser-site',
     },
   });
+
+  // 404 here is ambiguous and the ambiguity costs real debugging time: it means
+  // either "every release is still a draft" or "the token cannot see this repo".
+  // Distinguish them, because the first is a normal state waiting on a human
+  // and the second is a misconfiguration.
+  if (res.status === 404) {
+    const probe = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, {
+      headers: {
+        Authorization: `Bearer ${token()}`,
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'safe-browser-site',
+      },
+    });
+    if (probe.ok) {
+      throw new NoPublishedRelease('repo is visible; no published (non-draft) release yet');
+    }
+    throw new Error(`cannot see ${OWNER}/${REPO} with this token (status ${probe.status})`);
+  }
+
   if (!res.ok) {
     throw new Error(`GitHub release lookup failed: ${res.status}`);
   }

@@ -9,7 +9,7 @@
 // not worth the size; see /download/mac?arch=intel.
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { latestRelease, assetUrl } from './_github';
+import { latestRelease, assetUrl, NoPublishedRelease } from './_github';
 
 // Matched against asset names in order; first hit wins.
 const PATTERNS: Record<string, RegExp> = {
@@ -47,6 +47,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
     res.redirect(302, await assetUrl(asset.id));
   } catch (err) {
+    if (err instanceof NoPublishedRelease) {
+      // Normal state, not a fault: the release workflow uploads to a draft and
+      // a human publishes it. Say so, so this is not mistaken for an outage.
+      console.warn('[download] no published release yet');
+      res.status(404).send('No release has been published yet.');
+      return;
+    }
     console.error('[download]', err);
     res.status(503).send('Downloads are temporarily unavailable.');
   }
