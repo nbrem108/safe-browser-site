@@ -1,0 +1,10 @@
+{
+  "name": "safe-browser-site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Landing page and download/update endpoints for Safe Browser.",
+  "devDependencies": {
+    "@vercel/node": "^3.2.0",
+    "typescript": "^5.4.0"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/download/:platform", "destination": "/api/download?platform=:platform" },
+    { "source": "/updates/:file", "destination": "/api/updates?file=:file" }
+  ]
+}
