@@ -1,0 +1,10 @@
+# Tiny Internet
+User-agent: *
+Allow: /
+
+# The download and update endpoints resolve a GitHub release on every request.
+# Nothing to index there, and crawling them burns API quota for no benefit.
+Disallow: /download/
+Disallow: /updates/
+
+Sitemap: https://tinyinternet.app/sitemap.xml
