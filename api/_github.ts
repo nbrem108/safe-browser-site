@@ -7,8 +7,8 @@
 // browser a short-lived signed URL and step out of the way. No bandwidth cost,
 // no token on any client.
 
-const OWNER = process.env.GH_OWNER || 'nbrem108';
-const REPO = process.env.GH_REPO || 'safe-browser';
+const OWNER = process.env['GH_OWNER'] || 'nbrem108';
+const REPO = process.env['GH_REPO'] || 'safe-browser';
 
 export interface ReleaseAsset {
   id: number;
@@ -22,7 +22,7 @@ export interface Release {
 }
 
 function token(): string {
-  const t = process.env.GH_TOKEN;
+  const t = process.env['GH_TOKEN'];
   if (!t) throw new Error('GH_TOKEN is not set');
   return t;
 }

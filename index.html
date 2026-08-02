@@ -357,6 +357,10 @@
       <a class="btn ghost" href="/download/mac"><strong>Download for macOS</strong><span>macOS 11 or later · Apple silicon</span></a>
       <a class="btn ghost" href="/download/mac?arch=intel"><strong>Download for Mac (Intel)</strong><span>macOS 11 or later · older Macs</span></a>
     </div>
+    <!-- Filled in from /api/stats, which reads GitHub's own asset counters. Stays
+         hidden unless a real number comes back, so a page with no published
+         release yet simply does not mention it. -->
+    <p id="dl-count" class="fine" hidden style="margin-top: 1rem;"></p>
     <div class="note">
       <p><strong>You will see a warning the first time you open it.</strong> During
          the beta the app isn't yet registered with Microsoft and Apple, so both
@@ -374,6 +378,11 @@
          no account, no analytics, no crash reports. Three things do go out and
          none of them is about your child;
          <a href="/privacy">the full list is here</a>, written from the source code.</p>
+      <p style="margin-top: 0.9rem;"><strong>If something goes wrong.</strong> Email
+         <a href="mailto:support@tinyinternet.app">support@tinyinternet.app</a>. The
+         parent dashboard has a <em>Show details for support</em> button that gathers
+         the version and the recent error log for you to paste in — you see all of it
+         before you send anything, because the app has no crash reporting of its own.</p>
       <p style="margin-top: 0.9rem;"><strong>Updates.</strong> On Windows the app
          updates itself — it downloads new versions quietly in the background and
          they apply the next time it's closed and reopened. On a Mac you'll need
@@ -393,9 +402,26 @@
       Windows and macOS, not instead of them.
     </p>
     <p class="fine">Tiny Internet · Built for young children and the people looking after them.
-       · <a href="/privacy" style="color: var(--sky-deep);">What we send and where</a></p>
+       · <a href="/privacy" style="color: var(--sky-deep);">What we send and where</a>
+       · <a href="mailto:support@tinyinternet.app" style="color: var(--sky-deep);">support@tinyinternet.app</a></p>
   </div>
 </footer>
+
+<script>
+  // Decorative only — the page is complete and correct without it. Any failure,
+  // including "no release published yet", leaves the element hidden rather than
+  // putting an error or a zero in front of a parent.
+  fetch('/api/stats')
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (typeof d.downloads !== 'number' || d.downloads <= 0) return;
+      var el = document.getElementById('dl-count');
+      el.textContent = d.downloads.toLocaleString() + ' downloads so far'
+        + (d.latest ? ' · latest release ' + d.latest : '');
+      el.hidden = false;
+    })
+    .catch(function () { /* leave it hidden */ });
+</script>
 
 </body>
 </html>
